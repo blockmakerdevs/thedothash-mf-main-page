@@ -9,7 +9,7 @@ COPY ./etc/ssl/certs/cert.pem /etc/ssl/certs/
 COPY ./etc/ssl/private/key.pem /etc/ssl/private/
 
 # Exponemos los puertos en los que Nginx escuchará
-EXPOSE 80 443
+EXPOSE 443 443
 
 # Comando para iniciar Nginx en primer plano al arrancar el contenedor
 CMD ["nginx", "-g", "daemon off;"]
