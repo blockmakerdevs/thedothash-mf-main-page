@@ -1,23 +1,11 @@
-FROM nginx:alpine AS runtime
+# Utilizamos la imagen oficial de Nginx como base
+FROM nginx
 
-RUN apk add --no-cache bash
+# Copiamos el archivo de configuración personalizado al contenedor
+COPY nginx.conf /etc/nginx/nginx.conf
 
-ARG SERVER_NAME=_
-ARG PROXY_PASS=http://host.docker.internal:3000
-ARG PORT=4000
-ARG USERNAME=user
-ARG PASSWORD=password
+# Exponemos el puerto en el que Nginx escuchará
+EXPOSE 80
 
-RUN echo "server_name: $SERVER_NAME\nproxy_pass: $PROXY_PASS\nport: $PORT\nusername: $USERNAME\npassword: $PASSWORD"
-
-COPY ./configure_nginx.sh /etc/nginx/configure_nginx.sh
-RUN chmod +x /etc/nginx/configure_nginx.sh
-RUN /etc/nginx/configure_nginx.sh
-
-ENV USERNAME=$USERNAME
-ENV PASSWORD=$PASSWORD
-RUN apk add --no-cache openssl
-COPY ./gen_passwd.sh /etc/nginx/gen_passwd.sh
-RUN ["chmod", "+x", "/etc/nginx/gen_passwd.sh"]
-RUN /etc/nginx/gen_passwd.sh
-EXPOSE ${PORT}
+# Comando para iniciar Nginx en primer plano al arrancar el contenedor
+CMD ["nginx", "-g", "daemon off;"]
