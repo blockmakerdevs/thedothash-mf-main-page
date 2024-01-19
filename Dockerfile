@@ -1,7 +1,17 @@
-FROM caddy:latest
+FROM node:16-alpine
 
-COPY Caddyfile /etc/caddy/Caddyfile
+RUN mkdir -p /app
 
-RUN caddy fmt --overwrite /etc/caddy/Caddyfile
+WORKDIR /app
 
-CMD caddy run --config /etc/caddy/Caddyfile --adapter caddyfile 2>&1
+COPY package.json /app
+
+RUN yarn install
+
+COPY . /app
+
+RUN yarn build
+
+EXPOSE 3000
+
+CMD [ "yarn", "start" ]

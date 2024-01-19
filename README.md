@@ -1,51 +1,36 @@
-# [Caddy](https://caddyserver.com/) Frontend & Backend Reverse Proxy
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-**Combine your **separate** frontend and backend services into one domain!**
+## Getting Started
 
-### [View the example public project here](https://railway.app/project/35d8d571-4313-4049-9699-4e7db7f02a2f)
+First, run the development server:
 
-Access the frontend from `/*` and access the backend from `/api/*` on the same domain
-
-**Frontend - Vue 3:** https://mysite.up.railway.app/
-
-**Backend - Go Mux:** https://mysite.up.railway.app/api/
-
-The proxy configurations are done in the [`Caddyfile`](https://github.com/brody192/reverse-proxy/blob/main/Caddyfile) everything is commented for your ease of use!
-
-When deploying your Reverse Proxy service it will require you to set two service variables: **FRONTEND_HOST** and **BACKEND_HOST**
-
-**Note:** You will first need to have set a fixed `PORT` variable in both the frontend and backend services before deploying this template
-
-These are the two template variables that you will be required to fill out during the first deployment of this service, replace the respective `<frontend service name>` and `<backend service name>` with the service names as they appear in the Railway project view
-
-```
-FRONTEND_HOST = ${{<frontend service name>.RAILWAY_PRIVATE_DOMAIN}}:${{<frontend service name>.PORT}}
-BACKEND_HOST = ${{<backend service name>.RAILWAY_PRIVATE_DOMAIN}}:${{<backend service name>.PORT}}
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-**Relevant Caddy documentation:**
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-- [The Caddyfile](https://caddyserver.com/docs/caddyfile)
-- [Caddyfile Directives](https://caddyserver.com/docs/caddyfile/directives)
-- [reverse_proxy](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy)
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-**Some prerequisites to help with common issues that could arise:**
+This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-- Both the frontend and backend need to listen on fixed ports, in my Caddyfile I have used port `3000` in the proxy address, and configured my frontend and backend to both listen on port `3000`
-    - This can be done by [configuring your frontend and backend apps to listen on the `$PORT`](https://docs.railway.app/troubleshoot/fixing-common-errors) environment variable, then setting a `PORT` service variable to `3000`
+## Learn More
 
-- Since Railway's internal network is IPv6 only the frontend and backend apps will need to listen on `::` (all interfaces - both IPv4 and IPv6)
+To learn more about Next.js, take a look at the following resources:
 
-    **Start commands for some popular frameworks:**
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-    - **Gunicorn:** `gunicorn main:app -b [::]:$PORT`
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-    - **Uvicorn:** `uvicorn main:app --host :: --port $PORT`
+## Deploy on Vercel
 
-        - Uvicorn does not support dual stack binding (IPv6 and IPv4) from the CLI, so while that start command will work to enable access from within the private network, this prevents you from accessing the app from the public domain if needed, I recommend using [Hypercorn](https://pgjones.gitlab.io/hypercorn/) instead
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-    - **Hypercorn:** `hypercorn main:app --bind [::]:$PORT`
-
-    - **Next:** `next start -H :: --port $PORT`
-
-    - **Express/Nest:** `app.listen(process.env.PORT, "::");`
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.

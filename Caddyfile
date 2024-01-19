@@ -14,17 +14,18 @@
 }
 
 # site block, listens on the $PORT environment variable, automatically assigned by railway
-:433 {
+:{$PORT} {
 	# access logs
 	log {
 		format json # set access log format to json mode
 	}
 
+	reverse_proxy {$FRONTEND_HOST} # proxy all requests for /* to the frontend, configure this variable in the service settings
 
 	# the handle_path directive will strip /api/ from the path before proxying
 	# this is needed if your backend's api routes don't start with /api/
 	# change paths as needed
-	handle_path /* {
+	handle_path /api/* {
 		# this strips the /api/ prefix from the uri sent to the proxy address
 		reverse_proxy {$FRONTEND_HOST} # proxy all requests for /api/* to the backend, configure this variable in the service settings
 	}
