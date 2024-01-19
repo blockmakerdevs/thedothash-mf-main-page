@@ -1,18 +1,7 @@
-# Utilizamos la imagen oficial de Nginx como base
-FROM nginx
+FROM caddy:latest
 
-# Crear directorio para logs y dar permisos
-RUN mkdir -p /var/log/nginx && chown -R nginx:nginx /var/log/nginx
+COPY Caddyfile /etc/caddy/Caddyfile
 
-# Copiamos el archivo de configuración personalizado al contenedor
-COPY nginx.conf /etc/nginx/nginx.conf
+RUN caddy fmt --overwrite /etc/caddy/Caddyfile
 
-# Copiamos los certificados directamente en las carpetas correspondientes
-COPY ./etc/ssl/certs/cert.pem /etc/ssl/certs/
-COPY ./etc/ssl/private/key.pem /etc/ssl/private/
-
-# Exponemos los puertos en los que Nginx escuchará
-EXPOSE 443
-
-# Comando para iniciar Nginx en primer plano al arrancar el contenedor
-CMD ["nginx", "-g", "daemon off;"]
+CMD caddy run --config /etc/caddy/Caddyfile --adapter caddyfile 2>&1
