@@ -1,51 +1,55 @@
-# [Caddy](https://caddyserver.com/) Frontend & Backend Reverse Proxy
+﻿# Basic Auth Nginx Reverse Proxy for Railway.app's Services
 
-**Combine your **separate** frontend and backend services into one domain!**
+This is for web applications running in railway.app which need a basic auth without modifing source code.
+![image](https://github.com/BertramRay/railway-nginx-basic-auth/assets/42647595/5c3c12de-9615-45a4-a7b8-651425f8353a)
 
-### [View the example public project here](https://railway.app/project/35d8d571-4313-4049-9699-4e7db7f02a2f)
 
-Access the frontend from `/*` and access the backend from `/api/*` on the same domain
+You can add to railway easily by this button.
 
-**Frontend - Vue 3:** https://mysite.up.railway.app/
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/zx4xv3?referralCode=GLhtH9)
 
-**Backend - Go Mux:** https://mysite.up.railway.app/api/
+## Usage
 
-The proxy configurations are done in the [`Caddyfile`](https://github.com/brody192/reverse-proxy/blob/main/Caddyfile) everything is commented for your ease of use!
+### Step 1
 
-When deploying your Reverse Proxy service it will require you to set two service variables: **FRONTEND_HOST** and **BACKEND_HOST**
+Fork this repo, and deploy it in the same project which the services you want to add basic auth.
 
-**Note:** You will first need to have set a fixed `PORT` variable in both the frontend and backend services before deploying this template
+### Step 2
 
-These are the two template variables that you will be required to fill out during the first deployment of this service, replace the respective `<frontend service name>` and `<backend service name>` with the service names as they appear in the Railway project view
+Modify deployed service's enviroment variable. You should know that private network in railway is based on IPV6. So make sure your upstream applications have listened on an IPV6 port.
 
-```
-FRONTEND_HOST = ${{<frontend service name>.RAILWAY_PRIVATE_DOMAIN}}:${{<frontend service name>.PORT}}
-BACKEND_HOST = ${{<backend service name>.RAILWAY_PRIVATE_DOMAIN}}:${{<backend service name>.PORT}}
-```
+`ENABLE_ALPINE_PRIVATE_NETWORKING`
 
-**Relevant Caddy documentation:**
+Most important one. You need this for alpine image's network.
+Just set it to `ENABLE_ALPINE_PRIVATE_NETWORKING=true`.
 
-- [The Caddyfile](https://caddyserver.com/docs/caddyfile)
-- [Caddyfile Directives](https://caddyserver.com/docs/caddyfile/directives)
-- [reverse_proxy](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy)
+`PROXY_PASS`
 
-**Some prerequisites to help with common issues that could arise:**
+The service's private network you want to be proxied. Now supports multiple values separated by commas.
 
-- Both the frontend and backend need to listen on fixed ports, in my Caddyfile I have used port `3000` in the proxy address, and configured my frontend and backend to both listen on port `3000`
-    - This can be done by [configuring your frontend and backend apps to listen on the `$PORT`](https://docs.railway.app/troubleshoot/fixing-common-errors) environment variable, then setting a `PORT` service variable to `3000`
+Example: `http://app-name.up.railway.app:3000,http://another-app-name.up.railway.app:3000`
 
-- Since Railway's internal network is IPv6 only the frontend and backend apps will need to listen on `::` (all interfaces - both IPv4 and IPv6)
+`SERVER_NAME`
 
-    **Start commands for some popular frameworks:**
+The server name you want to use. Now supports multiple values separated by commas.
 
-    - **Gunicorn:** `gunicorn main:app -b [::]:$PORT`
+Example: `server1.yourdomain.com,server2.yourdomain.com`
 
-    - **Uvicorn:** `uvicorn main:app --host :: --port $PORT`
+`PORT`
 
-        - Uvicorn does not support dual stack binding (IPv6 and IPv4) from the CLI, so while that start command will work to enable access from within the private network, this prevents you from accessing the app from the public domain if needed, I recommend using [Hypercorn](https://pgjones.gitlab.io/hypercorn/) instead
+The port expose to public. Default is `80`.
+But someone said it's necessary for `Railway.app` detecting which port for nging.
 
-    - **Hypercorn:** `hypercorn main:app --bind [::]:$PORT`
+`USERNAME`
 
-    - **Next:** `next start -H :: --port $PORT`
+Username for auth. Default is `user`.
 
-    - **Express/Nest:** `app.listen(process.env.PORT, "::");`
+`PASSWORD`
+
+Password for auth. Default is `password`.
+
+## References
+
+1. [Simple HTML App with NGNIX Docker container doesn't run on Railway.app - Application failed to respond (error-503)](https://stackoverflow.com/questions/76348107/simple-html-app-with-ngnix-docker-container-doesnt-run-on-railway-app-applica)
+1. [OpenSSL コマンドでサーバー上で直接 .htpasswd に ID & パスワードを追加する](https://qiita.com/katzueno/items/07c8fb54b32e919128d4)
+1. [Workaround for Alpine-based images](https://docs.railway.app/reference/private-networking#workaround-for-alpine-based-images)
