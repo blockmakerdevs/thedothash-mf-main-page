@@ -12,9 +12,13 @@ const authStore = (set:any) => ({
     removeUser: () => set({user: null}),
 
     fetchAllUsers: async() => {
+       try {
         const {data} = await axios.get(`${BASE_URL}/api/users`)
         
         set({allUsers: data})
+       } catch (error) {
+        console.log(error)
+       }
     }
 })
 
